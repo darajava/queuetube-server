@@ -7,10 +7,27 @@ app.get('/', function(req, res){
 });
 
 io.on('connection', function(socket){
-  socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
+  socket.on('establish connection', function(token){
+    io.emit('establish connection', token);
+  });
+ 
+  socket.on('subscribe', function(room) { 
+    console.log('joining room', room);
+    socket.join(room); 
+  })
+
+  socket.on('unsubscribe', function(room) {  
+    console.log('leaving room', room);
+    socket.leave(room); 
+  })
+
+  socket.on('send', function(data) {
+    console.log('sending message');
+    io.sockets.in(data.room).emit('message', data);
   });
 });
+
+
 
 http.listen(3000, function(){
   console.log('listening on *:3000');
